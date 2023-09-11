@@ -4,6 +4,7 @@ import threading
 import random
 import time
 import re
+from tkinter.scrolledtext import ScrolledText
 
 # Variables globales para representar la simulación
 nucleos = 0
@@ -66,14 +67,28 @@ def simulacion_scheduler():
     while simulacion_en_ejecucion:
         if procesos:
             proceso = random.choice(procesos)
-            proceso.estado = random.choices(["preparado", "bloqueado", "terminado"], weights=[0.9, 0.07, 0.03])[0]
 
-            # Puedes actualizar la interfaz gráfica para reflejar el cambio de estado del proceso
+            # Simula la asignación de CPU
+            tiempo_ejecucion = random.randint(1, 5)
+            time.sleep(tiempo_ejecucion)
+
+            # Cambia el estado del proceso con las probabilidades especificadas
+            nuevo_estado = random.choices(
+                ["preparado", "bloqueado", "terminado"],
+                weights=[0.9, 0.07, 0.03]
+            )[0]
+
+            if nuevo_estado != proceso.estado:
+                # Si el estado ha cambiado, registra el evento
+                evento = f"Proceso {proceso.nombre} cambió a estado {nuevo_estado}"
+                registrar_evento(evento)
+
+            proceso.estado = nuevo_estado
+
+            # Actualiza la interfaz gráfica para reflejar el cambio de estado del proceso
             actualizar_tabla_procesos()
+            ventana.update_idletasks()
 
-        # Simula el tiempo que lleva ejecutar un proceso
-        tiempo_ejecucion = random.randint(1, 5)
-        time.sleep(tiempo_ejecucion)
 
 # Función para actualizar la tabla de procesos en la interfaz gráfica
 def actualizar_tabla_procesos():
@@ -123,6 +138,11 @@ def detener_simulacion():
     # Actualiza la etiqueta de estado de la simulación
     estado_simulacion_label.config(text="Simulación detenida")
 
+def registrar_evento(evento):
+    registro_eventos.insert(tk.END, evento + "\n")
+    registro_eventos.see(tk.END)  # Desplaza automáticamente al final del registro
+
+
 # Crear la ventana principal
 ventana = tk.Tk()
 ventana.title("Simulador de Scheduler")
@@ -158,6 +178,7 @@ nucleos_entry.pack()
 iniciar_simulacion_button = ttk.Button(ventana, text="Iniciar Simulación", command=iniciar_simulacion)
 iniciar_simulacion_button.pack()
 
+
 # Botón para detener la simulación
 detener_simulacion_button = ttk.Button(ventana, text="Detener Simulación", command=detener_simulacion)
 detener_simulacion_button.pack()
@@ -172,6 +193,10 @@ tabla_procesos.heading("Nombre", text="Nombre")
 tabla_procesos.heading("Prioridad", text="Prioridad")
 tabla_procesos.heading("Estado", text="Estado")
 tabla_procesos.pack()
+
+# Crear el área de registro de eventos
+registro_eventos = ScrolledText(ventana, wrap=tk.WORD, width=40, height=10)
+registro_eventos.pack()
 
 # Ejecutar la aplicación
 ventana.mainloop()

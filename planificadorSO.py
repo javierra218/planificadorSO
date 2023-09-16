@@ -51,11 +51,17 @@ def activar_campos():
 def crear_proceso():
     # Obtiene el valor del campo de prioridad
     prioridad = prioridad_entry.get()
+    nombre = nombre_entry.get()
+
+    # Validar que el nombre del proceso no se repita
+    nombres_procesos = [proceso.nombre for proceso in procesos]
+    if nombre in nombres_procesos:
+        mensaje_error.set("El nombre del proceso ya existe.")
+        return
 
     if validar_prioridad(prioridad, prioridad_entry):
         # El valor es válido, continúa con la creación del proceso
         prioridad = int(prioridad)  # Convierte la prioridad a entero si es válido
-        nombre = nombre_entry.get()
         
         # Crear un nuevo proceso
         proceso = Proceso(nombre, prioridad)

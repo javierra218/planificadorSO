@@ -63,8 +63,11 @@ def crear_proceso():
 # Función que simula la asignación de procesos a los núcleos de CPU
 def simulacion_scheduler():
     global simulacion_en_ejecucion
-
+    print("Simulación iniciada")
+    print(simulacion_en_ejecucion)
     while simulacion_en_ejecucion:
+        print("Prueba")
+        
         if procesos:
             proceso = random.choice(procesos)
 
@@ -108,7 +111,7 @@ def iniciar_simulacion():
         # Obtén la cantidad de núcleos de CPU ingresada por el usuario
         nucleos = int(nucleos_entry.get())
 
-        # Deshabilita los controles relevantes
+        # Deshabilita los botones y camposg
         nucleos_entry.config(state="disabled")
         nombre_entry.config(state="disabled")
         prioridad_entry.config(state="disabled")
@@ -201,3 +204,4 @@ registro_eventos.pack()
 # Ejecutar la aplicación
 ventana.mainloop()
 
+#ultima version

@@ -5,15 +5,18 @@ import random
 import time
 from tkinter.scrolledtext import ScrolledText
 from tkinter import ttk
+from PIL import Image, ImageTk
 
 # Variables globales para representar la simulación
 nucleos = 0
 simulacion_en_ejecucion = False
 procesos = []
-tabla_procesos=None
+tabla_procesos = None
 elementos_tabla = []
 
 # Clase para representar un proceso
+
+
 class Proceso:
     def __init__(self, nombre, prioridad):
         self.nombre = nombre
@@ -22,12 +25,15 @@ class Proceso:
         self.nucleo = None  # Núcleo al que está asignado (inicialmente None)
 
 # Función para validar la prioridad ingresada
+
+
 def validar_prioridad(valor, prioridad_entry):
     # Valida que el valor ingresado sea un número entero dentro del rango deseado.
     try:
         prioridad = int(valor)
         if 1 <= prioridad <= 10:
-            mensaje_error.set("")  # La entrada es válida, borra el mensaje de error
+            # La entrada es válida, borra el mensaje de error
+            mensaje_error.set("")
             return True
         else:
             # La entrada está fuera de rango, muestra un mensaje de error.
@@ -35,10 +41,13 @@ def validar_prioridad(valor, prioridad_entry):
             return False
     except ValueError:
         # La entrada no es un número entero, muestra un mensaje de error.
-        mensaje_error.set("La prioridad debe ser un número entero entre 1 y 10.")
+        mensaje_error.set(
+            "La prioridad debe ser un número entero entre 1 y 10.")
         return False
 
 # Función para activar los campos de nombre del proceso y prioridad
+
+
 def activar_campos():
     global nucleos, tabla_procesos  # Declarar que estamos usando la variable global
     nucleos = int(nucleos_entry.get())
@@ -48,7 +57,8 @@ def activar_campos():
         prioridad_entry.config(state="normal")
         crear_proceso_button.config(state="normal")
         aceptar_button.config(state="disabled")  # Desactiva el botón "Aceptar"
-        iniciar_simulacion_button.config(state="normal")  # Habilita el botón "Iniciar Simulación"
+        # Habilita el botón "Iniciar Simulación"
+        iniciar_simulacion_button.config(state="normal")
 
         # Crea la tabla de procesos (ahora dentro de esta función)
         crear_tabla_procesos()
@@ -58,15 +68,17 @@ def crear_tabla_procesos():
     global tabla_procesos  # Declarar que estamos usando la variable global
 
     # Crea una tabla para mostrar los procesos y sus estados
-    tabla_procesos = ttk.Treeview(ventana, columns=("Nombre", "Prioridad", "Estado", "Núcleo"), show="headings")
+    tabla_procesos = ttk.Treeview(ventana, columns=(
+        "Nombre", "Prioridad", "Estado", "Núcleo"), show="headings")
     tabla_procesos.heading("Nombre", text="Nombre")
     tabla_procesos.heading("Prioridad", text="Prioridad")
     tabla_procesos.heading("Estado", text="Estado")
     tabla_procesos.heading("Núcleo", text="Núcleo")
     tabla_procesos.pack()
 
-
 # Función para crear un nuevo proceso
+
+
 def crear_proceso():
     # Obtiene el valor del campo de prioridad
     prioridad = prioridad_entry.get()
@@ -80,33 +92,36 @@ def crear_proceso():
 
     if validar_prioridad(prioridad, prioridad_entry):
         # El valor es válido, continúa con la creación del proceso
-        prioridad = int(prioridad)  # Convierte la prioridad a entero si es válido
-        
+        # Convierte la prioridad a entero si es válido
+        prioridad = int(prioridad)
+
         # Crear un nuevo proceso
         proceso = Proceso(nombre, prioridad)
-        
+
         # Asignar el proceso a un núcleo aleatorio
         if nucleos > 0:
             proceso.nucleo = random.randint(1, nucleos)
-        
+
         # Agregar el proceso a la lista de procesos
         procesos.append(proceso)
-        
+
         # Puedes actualizar la interfaz gráfica para mostrar los procesos creados
         actualizar_tabla_procesos()
-        
+
         # Limpia los campos de entrada después de crear el proceso
         nombre_entry.delete(0, "end")
         prioridad_entry.delete(0, "end")
 
 # Función que simula la asignación de procesos a los núcleos de CPU
+
+
 def simulacion_scheduler():
     global simulacion_en_ejecucion
     print("Simulación iniciada")
     print(simulacion_en_ejecucion)
     while simulacion_en_ejecucion:
         print("Prueba")
-        
+
         if procesos:
             proceso = random.choice(procesos)
 
@@ -123,7 +138,8 @@ def simulacion_scheduler():
             if nuevo_estado != proceso.estado:
                 # Si el estado ha cambiado, registra el evento
                 evento = f"Proceso {proceso.nombre} cambió a estado {nuevo_estado}"
-                registrar_evento(evento)
+                #registrar_evento(evento)
+                ventana.after(0, lambda: registrar_evento(evento))
 
             proceso.estado = nuevo_estado
 
@@ -132,6 +148,8 @@ def simulacion_scheduler():
             ventana.update_idletasks()
 
 # Función para actualizar la tabla de procesos en la interfaz gráfica
+
+
 def actualizar_tabla_procesos():
     global tabla_procesos, elementos_tabla
 
@@ -147,10 +165,13 @@ def actualizar_tabla_procesos():
 
     # Agregar los procesos actualizados a la tabla y registrar los elementos
     for proceso in procesos:
-        elemento = tabla_procesos.insert("", "end", values=(proceso.nombre, proceso.prioridad, proceso.estado, proceso.nucleo))
+        elemento = tabla_procesos.insert("", "end", values=(
+            proceso.nombre, proceso.prioridad, proceso.estado, proceso.nucleo))
         elementos_tabla.append(elemento)
 
 # Función para iniciar la simulación
+
+
 def iniciar_simulacion():
     global simulacion_en_ejecucion, nucleos
 
@@ -162,8 +183,9 @@ def iniciar_simulacion():
         crear_proceso_button.config(state="disabled")
         aceptar_button.config(state="disabled")
         iniciar_simulacion_button.config(state="disabled")
-        detener_simulacion_button.config(state="normal")  # Habilita el botón "Detener Simulación"
-        
+        # Habilita el botón "Detener Simulación"
+        detener_simulacion_button.config(state="normal")
+
         # Habilita el botón "Mostrar Tablas" al iniciar la simulación
         mostrar_tablas_button.config(state="normal")
 
@@ -178,6 +200,8 @@ def iniciar_simulacion():
         simulacion_en_ejecucion = True
 
 # Función para detener la simulación
+
+
 def detener_simulacion():
     global simulacion_en_ejecucion
     simulacion_en_ejecucion = False
@@ -189,17 +213,23 @@ def detener_simulacion():
     crear_proceso_button.config(state="normal")
     aceptar_button.config(state="normal")
     iniciar_simulacion_button.config(state="normal")
-    detener_simulacion_button.config(state="disabled")  # Desactiva el botón "Detener Simulación"
+    # Desactiva el botón "Detener Simulación"
+    detener_simulacion_button.config(state="disabled")
 
     # Actualiza la etiqueta de estado de la simulación
     estado_simulacion_label.config(text="Simulación detenida")
 
 # Función para registrar eventos en el área de registro de eventos
+
+
 def registrar_evento(evento):
     registro_eventos.insert(tk.END, evento + "\n")
-    registro_eventos.see(tk.END)  # Desplaza automáticamente al final del registro
+    # Desplaza automáticamente al final del registro
+    registro_eventos.see(tk.END)
 
 # Función para mostrar tablas por núcleo
+
+
 def mostrar_tablas():
     global nucleos
 
@@ -217,7 +247,8 @@ def mostrar_tablas():
     # Crea una pestaña para cada núcleo
     for core in range(1, nucleos + 1):
         # Crear una tabla para el núcleo actual
-        tabla_procesos_core = ttk.Treeview(notebook, columns=("Nombre", "Prioridad", "Estado"), show="headings")
+        tabla_procesos_core = ttk.Treeview(notebook, columns=(
+            "Nombre", "Prioridad", "Estado"), show="headings")
         tabla_procesos_core.heading("Nombre", text="Nombre")
         tabla_procesos_core.heading("Prioridad", text="Prioridad")
         tabla_procesos_core.heading("Estado", text="Estado")
@@ -225,10 +256,12 @@ def mostrar_tablas():
         # Agregar los procesos del núcleo actual a la tabla
         for proceso in procesos:
             if proceso.nucleo == core:
-                tabla_procesos_core.insert("", "end", values=(proceso.nombre, proceso.prioridad, proceso.estado))
+                tabla_procesos_core.insert("", "end", values=(
+                    proceso.nombre, proceso.prioridad, proceso.estado))
 
         # Añadir la pestaña al Notebook
         notebook.add(tabla_procesos_core, text=f"Núcleo {core}")
+
 
 # Crear la ventana principal
 ventana = tk.Tk()
@@ -260,21 +293,25 @@ prioridad_entry.config(state="disabled")  # Inicialmente desactivada
 
 # Etiqueta para mostrar mensajes de error
 mensaje_error = tk.StringVar()
-mensaje_error_label = ttk.Label(ventana, textvariable=mensaje_error, foreground="red")
+mensaje_error_label = ttk.Label(
+    ventana, textvariable=mensaje_error, foreground="red")
 mensaje_error_label.pack()
 
 # Botón para crear un nuevo proceso (inicialmente desactivado)
-crear_proceso_button = ttk.Button(ventana, text="Crear Proceso", command=crear_proceso)
+crear_proceso_button = ttk.Button(
+    ventana, text="Crear Proceso", command=crear_proceso)
 crear_proceso_button.pack()
 crear_proceso_button.config(state="disabled")  # Inicialmente desactivado
 
 # Botón para iniciar la simulación (inicialmente desactivado)
-iniciar_simulacion_button = ttk.Button(ventana, text="Iniciar Simulación", command=iniciar_simulacion)
+iniciar_simulacion_button = ttk.Button(
+    ventana, text="Iniciar Simulación", command=iniciar_simulacion)
 iniciar_simulacion_button.pack()
 iniciar_simulacion_button.config(state="disabled")  # Inicialmente desactivado
 
 # Botón para detener la simulación (inicialmente desactivado)
-detener_simulacion_button = ttk.Button(ventana, text="Detener Simulación", command=detener_simulacion)
+detener_simulacion_button = ttk.Button(
+    ventana, text="Detener Simulación", command=detener_simulacion)
 detener_simulacion_button.pack()
 detener_simulacion_button.config(state="disabled")  # Inicialmente desactivado
 
@@ -287,7 +324,8 @@ registro_eventos = ScrolledText(ventana, wrap=tk.WORD, width=40, height=10)
 registro_eventos.pack()
 
 # Botón para mostrar tablas por núcleo
-mostrar_tablas_button = ttk.Button(ventana, text="Mostrar Tablas", command=mostrar_tablas)
+mostrar_tablas_button = ttk.Button(
+    ventana, text="Mostrar Tablas", command=mostrar_tablas)
 mostrar_tablas_button.pack()
 mostrar_tablas_button.config(state="disabled")  # Inicialmente desactivado
 

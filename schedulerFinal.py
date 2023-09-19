@@ -6,6 +6,8 @@ import time
 from tkinter.scrolledtext import ScrolledText
 import matplotlib.pyplot as plt
 import numpy as np
+import ttkthemes  # Importa ttkthemes
+
 
 
 # Variables globales para representar la simulación
@@ -325,17 +327,22 @@ def mostrar_grafica_procesos_por_nucleo():
 
 ##############################################################################################################################
 
-# Crear la ventana principal
-ventana = tk.Tk()
+# Crear la ventana principal con temas
+ventana = ttkthemes.ThemedTk()
+ventana.get_themes()  # Lista de temas disponibles
+ventana.set_theme("ubuntu")  # Elige un tema (por ejemplo, "smog")
 ventana.title("Simulador de Scheduler")
-# ventana.configure(bg="black")
 
-ventana['padx'] = '5'  # '5' espacio entre elementos horizontalmente
-ventana['pady'] = '5'  # '5' espacio entre elementos verticalmente
+# Crear la ventana principal sin temaas
+# ventana = tk.Tk()
+# ventana.title("Simulador de Scheduler")
+# # ventana.configure(bg="black")
+
+# ventana['padx'] = '5'  # '5' espacio entre elementos horizontalmente
+# ventana['pady'] = '5'  # '5' espacio entre elementos verticalmente
 
 # Configuración de la ventana para que no se pueda redimensionar o maximizarla (True por defecto).
 ventana.resizable(False, False)
-
 
 # Etiqueta y entrada para la cantidad de núcleos de CPU
 nucleos_label = ttk.Label(ventana, text="Núcleos de CPU:")

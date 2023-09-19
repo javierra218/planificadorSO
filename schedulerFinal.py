@@ -5,6 +5,7 @@ import random
 import time
 from tkinter.scrolledtext import ScrolledText
 import matplotlib.pyplot as plt
+import numpy as np
 
 
 # Variables globales para representar la simulación
@@ -18,6 +19,8 @@ elementos_tabla = []
 nucleos_disponibles = []
 
 # Clase para representar un proceso
+
+
 class Proceso:
     def __init__(self, nombre, prioridad):
         self.nombre = nombre
@@ -26,6 +29,8 @@ class Proceso:
         self.nucleo = None  # Núcleo al que está asignado (inicialmente None)
 
 # Función para validar la prioridad ingresada
+
+
 def validar_prioridad(valor, prioridad_entry):
     try:
         prioridad = int(valor)
@@ -36,12 +41,16 @@ def validar_prioridad(valor, prioridad_entry):
             mensaje_error.set("La prioridad debe estar en el rango de 1 a 10.")
             return False
     except ValueError:
-        mensaje_error.set("La prioridad debe ser un número entero entre 1 y 10.")
+        mensaje_error.set(
+            "La prioridad debe ser un número entero entre 1 y 10.")
         return False
 
 # Función para activar los campos y crear la lista de núcleos disponibles
+
+
 def activar_campos():
-    global nucleos, tabla_procesos, nucleos_disponibles  # Declarar que estamos usando la variable global
+    # Declarar que estamos usando la variable global
+    global nucleos, tabla_procesos, nucleos_disponibles
     nucleos = int(nucleos_entry.get())
     if nucleos > 0:
         nucleos_entry.config(state="disabled")
@@ -54,7 +63,8 @@ def activar_campos():
         # Crea la lista de núcleos disponibles
         nucleos_disponibles = ["Aleatorio"] + list(range(1, nucleos + 1))
         nucleo_combo["values"] = nucleos_disponibles
-        nucleo_combo.current(0)  # Establece "Aleatorio" como opción predeterminada
+        # Establece "Aleatorio" como opción predeterminada
+        nucleo_combo.current(0)
 
         # Crea la tabla de procesos (ahora dentro de esta función)
         crear_tabla_procesos()
@@ -64,7 +74,8 @@ def activar_campos():
 def crear_tabla_procesos():
     global tabla_procesos
     # Crea una tabla para mostrar los procesos y sus estados
-    tabla_procesos = ttk.Treeview(ventana, columns=("Nombre", "Prioridad", "Estado", "Núcleo"), show="headings")
+    tabla_procesos = ttk.Treeview(ventana, columns=(
+        "Nombre", "Prioridad", "Estado", "Núcleo"), show="headings")
     tabla_procesos.heading("Nombre", text="Nombre")
     tabla_procesos.heading("Prioridad", text="Prioridad")
     tabla_procesos.heading("Estado", text="Estado")
@@ -72,6 +83,8 @@ def crear_tabla_procesos():
     tabla_procesos.pack()
 
 # Función para crear una nueva ventana para mostrar tablas por núcleo
+
+
 def mostrar_tablas():
     global nucleos
 
@@ -105,6 +118,8 @@ def mostrar_tablas():
         notebook.add(tabla_procesos_core, text=f"Núcleo {core}")
 
 # Función para crear un nuevo proceso
+
+
 def crear_proceso():
     # Obtiene el valor del campo de prioridad
     prioridad = prioridad_entry.get()
@@ -157,11 +172,10 @@ def iniciar_simulacion():
         iniciar_simulacion_button.config(state="disabled")
         detener_simulacion_button.config(state="normal")
 
-
         # Habilita el botón "Mostrar Tablas" al iniciar la simulación
         mostrar_tablas_button.config(state="normal")
 
-        #Habilitar el boton grafica
+        # Habilitar el boton grafica
         mostrar_grafica_button.config(state="normal")
 
         # Actualiza la etiqueta de estado de la simulación
@@ -196,6 +210,8 @@ def detener_simulacion():
     estado_simulacion_label.config(text="Simulación detenida")
 
 # Función para simular la asignación de procesos a los núcleos de CPU
+
+
 def simulacion_scheduler():
     global simulacion_en_ejecucion
     print("Simulación iniciada")
@@ -227,6 +243,8 @@ def simulacion_scheduler():
             ventana.update_idletasks()
 
 # Función para actualizar la tabla de procesos en la interfaz gráfica
+
+
 def actualizar_tabla_procesos():
     global tabla_procesos, elementos_tabla
 
@@ -272,33 +290,52 @@ def mostrar_grafica_procesos_por_nucleo():
     nucleos = list(procesos_por_nucleo.keys())
     cantidad_procesos = list(procesos_por_nucleo.values())
 
-    fig, ax = plt.subplots(figsize=(8, 6))
+    # Establecer ubicaciones de barras como valores enteros en el eje x
+    x_pos = np.arange(len(nucleos))
 
-    # Cambia el color de las barras y agrega etiquetas
-    colores = ['dodgerblue', 'limegreen', 'gold', 'tomato', 'mediumorchid', 'lightcoral', 'lightskyblue', 'lightgreen', 'lightyellow', 'lightcoral']
-    ax.bar(nucleos, cantidad_procesos, color=colores, edgecolor='black', linewidth=1.2)
+    # Crear una figura con nombre personalizado
+    fig = plt.figure("Uso General", figsize=(8, 6))
+
+    # Utilizar una paleta de colores más sobria
+    # Paleta de colores de Matplotlib
+    colores = plt.cm.Paired(range(len(nucleos)))
+
+    plt.bar(x_pos, cantidad_procesos, color=colores,
+            edgecolor='black', linewidth=1.2)
 
     # Etiquetas de los ejes y título
-    ax.set_xlabel('Núcleo de CPU', fontsize=12)
-    ax.set_ylabel('Cantidad de Procesos', fontsize=12)
-    ax.set_title('Distribución de Procesos en Núcleos de CPU', fontsize=14)
+    plt.xlabel('Núcleo de CPU', fontsize=12)
+    plt.ylabel('Cantidad de Procesos', fontsize=12)
+    plt.title('Distribución de Procesos en Núcleos de CPU', fontsize=14)
 
     # Estilo del grid
-    ax.grid(axis='y', linestyle='--', alpha=0.7)
+    plt.grid(axis='y', linestyle='--', alpha=0.7)
 
     # Mostrar etiquetas en las barras
     for i, cantidad in enumerate(cantidad_procesos):
-        ax.text(nucleos[i], cantidad + 0.2, str(cantidad), ha='center', fontsize=10)
+        plt.text(x_pos[i], cantidad + 0.2, str(int(cantidad)),
+                 ha='center', fontsize=10)  # Formatear como entero
 
-    # Mostrar la gráfica
-    plt.xticks(nucleos)
+    # Etiquetas en el eje x
+    plt.xticks(x_pos, nucleos)
+
     plt.tight_layout()
     plt.show()
 
 
+##############################################################################################################################
+
 # Crear la ventana principal
 ventana = tk.Tk()
 ventana.title("Simulador de Scheduler")
+# ventana.configure(bg="black")
+
+ventana['padx'] = '5'  # '5' espacio entre elementos horizontalmente
+ventana['pady'] = '5'  # '5' espacio entre elementos verticalmente
+
+# Configuración de la ventana para que no se pueda redimensionar o maximizarla (True por defecto).
+ventana.resizable(False, False)
+
 
 # Etiqueta y entrada para la cantidad de núcleos de CPU
 nucleos_label = ttk.Label(ventana, text="Núcleos de CPU:")
@@ -336,13 +373,13 @@ crear_proceso_button = ttk.Button(
 crear_proceso_button.pack()
 crear_proceso_button.config(state="disabled")  # Inicialmente desactivado
 
-
 # Agregar la lista desplegable para seleccionar el núcleo
 nucleo_label = ttk.Label(ventana, text="Núcleo:")
 nucleo_label.pack()
 nucleo_combo = ttk.Combobox(ventana, values=nucleos_disponibles)
 nucleo_combo.pack()
-nucleo_combo.config(state="readonly")  # La lista desplegable es de solo lectura
+# La lista desplegable es de solo lectura
+nucleo_combo.config(state="readonly")
 
 # Botón para iniciar la simulación (inicialmente desactivado)
 iniciar_simulacion_button = ttk.Button(
